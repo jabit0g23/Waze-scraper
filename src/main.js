@@ -1,11 +1,16 @@
-const { runScraper } = require('./scraper/scraper');
+const { createTopics } = require('./config/kafka');
+const { startScraper } = require('./scraper/scraper');
 
 (async () => {
-    try {
-        console.log('Iniciando scraper...');
-        await runScraper();
-        console.log('Scraper finalizado correctamente.');
-    } catch (error) {
-        console.error('Error ejecutando el scraper:', error);
-    }
+  try {
+    console.log('Creando topics...');
+    await createTopics();
+    console.log('Topics creados.');
+
+    console.log('Iniciando scraper...');
+    await startScraper();
+    console.log('Scraper iniciado.');
+  } catch (error) {
+    console.error('Error al iniciar la aplicación:', error);
+  }
 })();

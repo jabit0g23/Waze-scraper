@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.15.2",
+    "cassandra-driver": "^4.7.2",
     "csv-parser": "^3.0.0",
     "kafkajs": "^2.2.4",
     "puppeteer": "^23.7.0"

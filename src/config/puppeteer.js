@@ -1,7 +1,10 @@
 const puppeteer = require('puppeteer');
 
 async function initBrowser() {
-    return await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    return browser;
 }
 
 module.exports = { initBrowser };

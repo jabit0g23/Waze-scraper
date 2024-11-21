@@ -3,23 +3,23 @@ const { processTrafficData } = require('../services/trafficProcessor');
 async function interceptResponses(page, city) {
     let lastResponse = null;
 
-    // Escucha todas las respuestas de la página
+    // Escucha las respuestas de la red
     page.on('response', async (response) => {
         const url = response.url();
         if (url.includes('/api/georss')) {
-            lastResponse = response; // Guarda la última respuesta que coincide
+            lastResponse = response;
         }
     });
 
-    // Espera para acumular respuestas
+    // Espera un tiempo razonable para que las respuestas relevantes lleguen
     await new Promise(resolve => setTimeout(resolve, 10000));
 
-    // Procesa la última respuesta si existe
     if (lastResponse) {
         try {
-            const data = await lastResponse.json().catch(() => null); // Asegura un JSON válido
+            const data = await lastResponse.json().catch(() => null);
             if (data) {
-                processTrafficData(data, city);
+                console.log(`Procesando datos de tráfico para ${city}`);
+                await processTrafficData(data, city);
             } else {
                 console.error('No se pudo procesar la última respuesta (JSON no válido)');
             }
