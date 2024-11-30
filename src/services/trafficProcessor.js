@@ -1,4 +1,5 @@
 const { sendToElastic } = require('./elasticsearchService');
+const { sendToKafka } = require('./kafkaProducer');
 
 function processTrafficData(data, city) {
     if (Array.isArray(data.jams)) {
@@ -12,7 +13,9 @@ function processTrafficData(data, city) {
                 length: jam.length,
                 timestamp: new Date().toISOString(),
             };
-            sendToElastic('jams_details', jamDetails.idJam, jamDetails);
+            // Enviar a Elasticsearch si lo deseas
+            // sendToElastic('jams_details', jamDetails.idJam, jamDetails);
+            sendToKafka('jams', jamDetails);
         });
     }
 
@@ -25,7 +28,9 @@ function processTrafficData(data, city) {
                 streetName: alert.street,
                 timestamp: new Date().toISOString(),
             };
-            sendToElastic('alerts_details', alertDetails.idAlert, alertDetails);
+            // Enviar a Elasticsearch si lo deseas
+            // sendToElastic('alerts_details', alertDetails.idAlert, alertDetails);
+            sendToKafka('alerts', alertDetails);
         });
     } else {
         console.log('No se encontraron alertas.');
