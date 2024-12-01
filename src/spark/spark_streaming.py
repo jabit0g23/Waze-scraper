@@ -52,8 +52,8 @@ def main():
         col("commune")
     ).count()
 
-    # Función para escribir en Elasticsearch
-    def write_to_elasticsearch(df, epoch_id):
+    # Función para escribir 'jams' en Elasticsearch
+    def write_jams_to_elasticsearch(df, epoch_id):
         es_nodes = "http://elasticsearch:9200"
         df.write \
             .format("org.elasticsearch.spark.sql") \
@@ -62,13 +62,66 @@ def main():
             .mode("append") \
             .save()
 
-    query = jams_stats.writeStream \
+    jams_query = jams_stats.writeStream \
         .outputMode("Update") \
-        .foreachBatch(write_to_elasticsearch) \
+        .foreachBatch(write_jams_to_elasticsearch) \
         .start()
 
-    # Espera a que el streaming termine
-    query.awaitTermination()
+    # Esquema para los mensajes de 'alerts'
+    alerts_schema = StructType([
+        StructField("idAlert", StringType()),
+        StructField("type", StringType()),
+        StructField("subtype", StringType()),
+        StructField("latitude", DoubleType()),
+        StructField("longitude", DoubleType()),
+        StructField("timestamp", StringType()),
+    ])
+
+    # Lectura desde el tópico 'alerts'
+    alerts_df = spark \
+        .readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "kafka:9092") \
+        .option("subscribe", "alerts") \
+        .option("startingOffsets", "latest") \
+        .load()
+
+    alerts_parsed = alerts_df.selectExpr("CAST(value AS STRING) as json_string") \
+        .select(from_json(col("json_string"), alerts_schema).alias("data")) \
+        .select("data.*")
+
+    alerts_parsed = alerts_parsed.withColumn("timestamp", to_timestamp(col("timestamp")))
+
+    # (Opcional) Filtrar o transformar los datos de 'alerts'
+    # Por ejemplo, filtrar por tipo de alerta
+    # alerts_filtered = alerts_parsed.filter(col("type") == "ACCIDENT")
+
+    # Agregar marca de agua
+    alerts_parsed = alerts_parsed.withWatermark("timestamp", "10 minutes")
+
+    # (Opcional) Agrupar por tipo y calcular conteo en ventana de tiempo
+    alerts_stats = alerts_parsed.groupBy(
+        window(col("timestamp"), "5 minutes"),
+        col("type")
+    ).count()
+
+    # Función para escribir 'alerts' en Elasticsearch
+    def write_alerts_to_elasticsearch(df, epoch_id):
+        es_nodes = "http://elasticsearch:9200"
+        df.write \
+            .format("org.elasticsearch.spark.sql") \
+            .option("es.resource", "alerts_processed") \
+            .option("es.nodes", es_nodes) \
+            .mode("append") \
+            .save()
+
+    alerts_query = alerts_stats.writeStream \
+        .outputMode("Update") \
+        .foreachBatch(write_alerts_to_elasticsearch) \
+        .start()
+
+    # Espera a que los streamings terminen
+    spark.streams.awaitAnyTermination()
 
 if __name__ == "__main__":
     main()
