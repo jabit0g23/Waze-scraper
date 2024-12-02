@@ -1,4 +1,3 @@
--- Crear el keyspace 'waze_traffic' si no existe
 CREATE KEYSPACE IF NOT EXISTS waze_traffic WITH replication = {
     'class': 'SimpleStrategy',
     'replication_factor' : 1
