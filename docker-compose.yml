@@ -39,7 +39,7 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS= -Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - "9200:9200"
     networks:
@@ -56,7 +56,6 @@ services:
       - "5601:5601"
     networks:
       - elastic_network
-    
 
   spark-master:
     image: bitnami/spark:3.5
@@ -99,6 +98,23 @@ services:
       - spark-network
       - kafka_network
       - elastic_network
+
+  cassandra:
+    image: cassandra:3.11
+    container_name: cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=WazeCluster
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=Rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    ports:
+      - "9042:9042"
+    networks:
+      - spark-network
+      - kafka_network
+      - elastic_network
+    volumes:
+      - ./cassandra-init:/docker-entrypoint-initdb.d
 
 networks:
   elastic_network:
