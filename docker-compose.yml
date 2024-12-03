@@ -37,6 +37,7 @@ services:
   elasticsearch:
     image: elasticsearch:7.17.5
     container_name: elasticsearch
+    hostname: elasticsearch
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
