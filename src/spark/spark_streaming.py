@@ -27,6 +27,7 @@ def get_jams_schema():
     return StructType([
         StructField("idJam", StringType()),
         StructField("commune", StringType()),
+        StructField("country", StringType()),
         StructField("streetName", StringType()),
         StructField("streetEnd", StringType()),
         StructField("speedKmh", DoubleType()),
@@ -38,6 +39,7 @@ def get_alerts_schema():
     return StructType([
         StructField("idAlert", StringType()),
         StructField("commune", StringType()),
+        StructField("country", StringType()),
         StructField("typeAlert", StringType()),
         StructField("streetName", StringType()),
         StructField("timestamp", StringType()),
@@ -99,6 +101,7 @@ def process_jams(spark):
     jams_stats = jams_filtered.groupBy(
         window(col("timestamp"), "5 minutes"),
         col("commune"),
+        col("country"),
         col("idjam")
     ).count().withColumn("window_start", col("window.start")) \
       .withColumn("window_end", col("window.end")) \
@@ -140,6 +143,7 @@ def process_alerts(spark):
     alerts_stats = alerts_df.groupBy(
         window(col("timestamp"), "5 minutes"),
         col("typealert"),
+        col("country"),
         col("idalert")
     ).count().withColumn("window_start", col("window.start")) \
       .withColumn("window_end", col("window.end")) \

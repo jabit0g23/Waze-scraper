@@ -6,6 +6,7 @@ function processTrafficData(data, city) {
         data.jams.forEach(jam => {
             const jamDetails = {
                 idJam: jam.id,
+                country: jam.country,
                 commune: jam.city,
                 streetName: jam.street,
                 streetEnd: jam.endNode,
@@ -13,8 +14,6 @@ function processTrafficData(data, city) {
                 length: jam.length,
                 timestamp: new Date().toISOString(),
             };
-            // Enviar a Elasticsearch si lo deseas
-            // sendToElastic('jams_details', jamDetails.idJam, jamDetails);
             sendToKafka('jams', jamDetails);
         });
     }
@@ -23,13 +22,12 @@ function processTrafficData(data, city) {
         data.alerts.forEach(alert => {
             const alertDetails = {
                 idAlert: alert.id,
+                country: alert.country,
                 commune: alert.city,
                 typeAlert: alert.type,
                 streetName: alert.street,
                 timestamp: new Date().toISOString(),
             };
-            // Enviar a Elasticsearch si lo deseas
-            // sendToElastic('alerts_details', alertDetails.idAlert, alertDetails);
             sendToKafka('alerts', alertDetails);
         });
     } else {

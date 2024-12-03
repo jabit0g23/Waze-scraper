@@ -8,6 +8,7 @@ CREATE KEYSPACE IF NOT EXISTS waze_traffic WITH replication = {
 CREATE TABLE IF NOT EXISTS waze_traffic.jams (
     idjam text PRIMARY KEY,
     commune text,
+    country text,
     streetname text,
     streetend text,
     speedkmh double,
@@ -19,6 +20,7 @@ CREATE TABLE IF NOT EXISTS waze_traffic.jams (
 CREATE TABLE IF NOT EXISTS waze_traffic.alerts (
     idalert text PRIMARY KEY,
     commune text,
+    country text,
     typealert text,
     streetname text,
     timestamp timestamp
