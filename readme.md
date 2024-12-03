@@ -4,6 +4,8 @@
 
 **Waze Traffic Processor** es una aplicación que procesa datos de tráfico en tiempo real utilizando Apache Spark, Kafka, Cassandra, y Elasticsearch. La aplicación se despliega utilizando Docker y Docker Compose para facilitar la gestión de los diferentes servicios involucrados.
 
+**[Ver video de implementación](https://drive.google.com/file/d/1MptzfqksVPbxP4y58kWaXR2s550dLztH/view?usp=sharing)**
+
 ## Prerrequisitos
 
 Antes de comenzar, asegúrate de tener instalados los siguientes componentes en tu sistema:
