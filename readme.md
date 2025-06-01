@@ -24,7 +24,7 @@ Sigue estos pasos para configurar y ejecutar la aplicación.
 Si aún no tienes el código fuente, clónalo desde el repositorio:
 
 ```bash
-git clone https://github.com/tu_usuario/waze-traffic-processor.git
+git clone https://github.com/jabit0g23/waze-traffic-processor.git
 cd waze-traffic-processor
 ```
 
